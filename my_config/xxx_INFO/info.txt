@@ -1,3 +1,82 @@
+==========  kalibrace tiskárny  ===============
+" test endstop "
+QUERY_ENDSTOPS
+--------------------------------------------------
+SET_VELOCITY_LIMIT VELOCITY=300
+SET_VELOCITY_LIMIT ACCEL=3000
+
+SET_TMC_CURRENT STEPPER=stepper_x CURRENT=0.950
+SET_TMC_CURRENT STEPPER=stepper_y CURRENT=0.950
+SET_TMC_CURRENT STEPPER=stepper_z CURRENT=0.950
+
+" test stepperů "
+STEPPER_BUZZ STEPPER=stepper_x
+STEPPER_BUZZ STEPPER=stepper_y
+STEPPER_BUZZ STEPPER=stepper_z
+STEPPER_BUZZ STEPPER=extruder
+--------------------------------------------------
+
+" kalibrace 'rotation_distance' pro extruder "
+- označit strunu od konce extruderu 100 mm
+- vytlačit 50 mm 'requested_extrude_distance¨'
+
+ M109 S220 
+ G91 
+ G1 E50 F60
+ 
+- změřit kolik se vytlačilo ke značce 100 mm od konce extruderu 'actual_extrude_distance'
+- vypčitat novou hodnotu 'rotation_distance'
+ = previous_rotation_distance * ( actual_extrude_distance / requested_extrude_distance) 
+--------------------------------------------------
+
+===========  printer.cfg ==============
+" přidat na konec souboru pokud zde nejsou tyto configurace "
+" jinak nebude fungovat SAVE_CONFIG. V konfiguracích potom zakomentovat "
+" tato nastavení "
+ 
+#*# <---------------------- SAVE_CONFIG ---------------------->
+#*# DO NOT EDIT THIS BLOCK OR BELOW. The contents are auto-generated.
+#*#
+#*# [extruder]
+#*# control = pid
+#*# pid_kp = 26.604
+#*# pid_ki = 6.320
+#*# pid_kd = 27.995
+#*#
+#*# [heater_bed]
+#*# control = pid
+#*# pid_Kp=67.461 
+#*# pid_Ki=0.953 
+#*# pid_Kd=1194.066
+#*#
+#*# [probe]
+#*# z_offset = 1.540
+#*#
+
+==========================================
+
+" PID kalibrace "
+PID_CALIBRATE HEATER=extruder TARGET=170
+SAVE_CONFIG
+
+PID_CALIBRATE HEATER=heater_bed TARGET=60
+SAVE_CONFIG
+--------------------------------------------------
+
+" kalibrace sondy Z "
+PROBE_CALIBRATE   ( DELTA_CALIBRATE / MANUAL_PROBE / Z_ENDSTOP_CALIBRATE)
+TESTZ Z=-.1     ( TESTZ Z=- / TESTZ Z=-- / TESTZ Z=+ / TESTZ Z=++ )
+ACCEPT
+--------------------------------------------------
+
+" Input Shaper auto-calibration "
+G28
+SHAPER_CALIBRATE
+....
+SAVE_CONFIG
+
+-----------------------------------------------
+
 PROBE_ACCURACY SAMPLES=100
 
 X:120.000 

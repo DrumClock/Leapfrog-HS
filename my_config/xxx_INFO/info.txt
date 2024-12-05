@@ -75,6 +75,12 @@ SHAPER_CALIBRATE
 ....
 SAVE_CONFIG
 
+
+" Input Shaper - calibration "
+
+~/klipper/scripts/calibrate_shaper.py /tmp/calibration_data_x.csv -o /tmp/shaper_calibrate_x.png
+~/klipper/scripts/calibrate_shaper.py /tmp/calibration_data_y.csv -o /tmp/shaper_calibrate_y.png
+
 -----------------------------------------------
 
 PROBE_ACCURACY SAMPLES=100
